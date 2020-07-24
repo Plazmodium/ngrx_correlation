@@ -1,0 +1,15 @@
+.trueState {
+  color: rgb(2, 160, 2);
+}
+.falseState {
+  color: red;
+}
+
+.blink {
+  animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+  10% {
+    opacity: 0;
+  }
+}
