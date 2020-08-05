@@ -13,8 +13,9 @@ import {
   first,
   switchMap,
   filter,
+  mergeAll,
 } from "rxjs/operators";
-import { of, race, forkJoin, throwError, merge } from "rxjs";
+import { of, race, forkJoin, throwError, merge, pipe, zip } from "rxjs";
 import { IPostsResponse } from "../Models/posts.model";
 import { ICommentsResponse } from "../Models/comments.models";
 import * as fromActions from "./get-stuff.actions";
@@ -77,30 +78,22 @@ export class GetStuffEffects {
         //#endregion
 
         console.log('here 3', failAction$);
-        return of(merge(forkJoin([post$, comment$]), failAction$));
+        // return of(race(zip([post$, comment$]), failAction$));
+        return of(merge(forkJoin(([post$, comment$]), failAction$)));
         //return of(merge(post$, comment$, failAction$));
         // return of(race(forkJoin([post$, comment$]), failAction$));
-        
       }),
       map((data) => {
-        // data.pipe(
-        //   tap(x => {
-        //     console.log('here 5', x);
-        //   }),
-        // );
-        data.subscribe(y => console.log('y', y));
-        
-        const comments = data[1];
         // const { postData } = data[0];
         // const { commentsData } = data[1];
-
-        console.log("postData", comments);
-
-        if (comments !== undefined) {
-          return fromActions.initiateSuccess({ data: comments });
-        } else {
-          return fromActions.initiateSuccess({ data: ["Not Working"] });
-        }
+        data.subscribe(x => console.log('x', x))
+        console.log("postData", data);
+        return fromActions.initiateSuccess({ data: data });
+        // if (comments !== undefined) {
+        //   return fromActions.initiateSuccess({ data: comments });
+        // } else {
+        //   return fromActions.initiateSuccess({ data: ["Not Working"] });
+        // }
       }),
       catchError(error => {
         console.log('ERROR: ', error);
